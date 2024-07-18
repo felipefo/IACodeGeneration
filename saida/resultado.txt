@@ -1,0 +1,192 @@
+================================== Ai Message ==================================
+
+```csharp
+//Inicio:Entity.cs
+using System;
+
+namespace ConectaFapes.Domain.Common
+{
+    public class Entity
+    {
+        public int Id { get; set; }
+    }
+}
+//Fim:Entity.cs
+
+//Inicio:Produto.cs
+using System;
+using System.Collections.Generic;
+using ConectaFapes.Domain.Common;
+using ConectaFapes.Domain.Exceptions;
+
+namespace ConectaFapes.Domain.Entities
+{
+    public class Produto : Entity
+    {
+        public string Nome { get; private set; }
+        public decimal Preco { get; private set; }
+        public int CategoriaId { get; private set; }
+        public virtual Categoria Categoria { get; private set; }
+
+        public Produto(string nome, decimal preco, int categoriaId)
+        {
+            Validar(nome, preco);
+            Nome = nome;
+            Preco = preco;
+            CategoriaId = categoriaId;
+        }
+
+        // Construtor para Entity Framework
+        protected Produto() { }
+
+        public void Atualizar(string nome, decimal preco)
+        {
+            Validar(nome, preco);
+            Nome = nome;
+            Preco = preco;
+        }
+
+        private void Validar(string nome, decimal preco)
+        {
+            var erros = new List<string>();
+
+            if (preco <= 0)
+                erros.Add("O preço do produto deve ser maior que zero.");
+
+            if (string.IsNullOrEmpty(nome))
+                erros.Add("O nome do produto não pode ser vazio.");
+
+            if (erros.Count > 0)
+                throw new DomainException(erros);
+        }
+    }
+}
+//Fim:Produto.cs
+
+//Inicio:Categoria.cs
+using System;
+using System.Collections.Generic;
+using ConectaFapes.Domain.Common;
+using ConectaFapes.Domain.Exceptions;
+
+namespace ConectaFapes.Domain.Entities
+{
+    public class Categoria : Entity
+    {
+        public string Nome { get; private set; }
+        public virtual ICollection<Produto> Produtos { get; private set; } = new List<Produto>();
+
+        public Categoria(string nome)
+        {
+            Validar(nome);
+            Nome = nome;
+        }
+
+        // Construtor para Entity Framework
+        protected Categoria() { }
+
+        public void Atualizar(string nome)
+        {
+            Validar(nome);
+            Nome = nome;
+        }
+
+        private void Validar(string nome)
+        {
+            if (string.IsNullOrEmpty(nome))
+                throw new DomainException("O nome da categoria não pode ser vazio.");
+        }
+    }
+}
+//Fim:Categoria.cs
+
+//Inicio:Usuario.cs
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using ConectaFapes.Domain.Common;
+using ConectaFapes.Domain.Exceptions;
+
+namespace ConectaFapes.Domain.Entities
+{
+    public class Usuario : Entity
+    {
+        public string Nome { get; private set; }
+        public string Email { get; private set; }
+        public string Senha { get; private set; }
+
+        public Usuario(string nome, string email, string senha)
+        {
+            Validar(email, senha);
+            Nome = nome;
+            Email = email;
+            Senha = senha;
+        }
+
+        // Construtor para Entity Framework
+        protected Usuario() { }
+
+        public void Atualizar(string nome, string email, string senha)
+        {
+            Validar(email, senha);
+            Nome = nome;
+            Email = email;
+            Senha = senha;
+        }
+
+        private void Validar(string email, string senha)
+        {
+            var erros = new List<string>();
+
+            if (!IsValidEmail(email))
+                erros.Add("O email fornecido não é válido.");
+
+            if (!IsUniqueEmail(email))
+                erros.Add("Já existe um usuário cadastrado com este email.");
+
+            if (senha.Length < 8)
+                erros.Add("A senha deve ter no mínimo 8 caracteres.");
+
+            if (erros.Count > 0)
+                throw new DomainException(erros);
+        }
+
+        // Implementação da função auxiliar isValidEmail
+        private bool IsValidEmail(string email)
+        {
+            return Regex.IsMatch(email, @"^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$");
+        }
+
+        // Implementação da função auxiliar isUniqueEmail (apenas exemplo)
+        private bool IsUniqueEmail(string email)
+        {
+            // Lógica para verificar a unicidade do email (ex: consultar o banco de dados)
+            // ...
+            return true; 
+        }
+    }
+}
+//Fim:Usuario.cs
+
+//Inicio:DomainException.cs
+using System;
+using System.Collections.Generic;
+
+namespace ConectaFapes.Domain.Exceptions
+{
+    public class DomainException : Exception
+    {
+        public List<string> Errors { get; }
+
+        public DomainException(List<string> errors)
+        {
+            Errors = errors;
+        }
+
+        public DomainException(string message) : base(message) { }
+
+        public DomainException(string message, Exception innerException) : base(message, innerException) { }
+    }
+}
+//Fim:DomainException.cs
+```

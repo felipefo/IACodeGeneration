@@ -1,0 +1,36 @@
+================================== Ai Message ==================================
+
+```csharp
+//Inicio:Produto.cs
+using ConectaFapes.Domain.Entities; // Importação da classe Categoria
+
+namespace ConectaFapes.Domain.Entities // Substitua pelo seu namespace
+{
+    public class Produto
+    {
+    }
+}
+//Fim:Produto.cs
+
+//Inicio:Categoria.cs
+using System.Collections.Generic;
+
+namespace ConectaFapes.Domain.Entities // Substitua pelo seu namespace
+{
+    public class Categoria
+    { 
+    }
+}
+//Fim:Categoria.cs
+
+//Inicio:Usuario.cs
+using System.Text.RegularExpressions;
+
+namespace ConectaFapes.Domain.Entities // Substitua pelo seu namespace
+{
+    public class Usuario
+    { 
+    }
+}
+//Fim:Usuario.cs
+```
