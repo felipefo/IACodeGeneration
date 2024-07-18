@@ -42,6 +42,8 @@ python pos_geracao/processa_saida.py
 O resultado é a criação de pastas de arquivos c# dentro do projeto DotNet: MiniApiDotNet
 
 
+## Pastas
+
 - dsl: pastas com arquivos  
 - exemplos: pastas com arquivos de exemplos com código fonte 
 - saida: pastas com saida da IA
