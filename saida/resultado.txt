@@ -25,163 +25,181 @@ namespace ConectaFapes.Domain.Common
 //Fim:BaseEntity.cs
 
 //Inicio:Produto.cs
-using ConectaFapes.Domain.Common;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ConectaFapes.Domain.Entities
 {
     public class Produto : BaseEntity
     {
-        public string Nome { get; private set; }
-        public decimal Preco { get; private set; }
-        public int CategoriaId { get; private set; }
-        public virtual Categoria Categoria { get; private set; }
+        public string Nome { get; set; } = string.Empty;
+        public decimal Preco { get; set; }
+        public int CategoriaId { get; set; }
+
+        [ForeignKey("CategoriaId")]
+        public virtual Categoria Categoria { get; set; } = null!;
+
+        public Produto() { }
 
         public Produto(string nome, decimal preco, int categoriaId)
         {
-            Validar(nome, preco);
-            Nome = nome;
-            Preco = preco;
-            CategoriaId = categoriaId;
-        }
-
-        // Construtor para Entity Framework
-        protected Produto() { }
-
-        public void Atualizar(string nome, decimal preco, int categoriaId)
-        {
-            Validar(nome, preco);
-            Nome = nome;
-            Preco = preco;
-            CategoriaId = categoriaId;
-        }
-
-        private void Validar(string nome, decimal preco)
-        {
+            // Regras de Negócio
             if (preco <= 0)
             {
-                throw new DomainException("O preço do produto deve ser maior que zero.");
+                throw new ArgumentException("Preço deve ser maior que zero.");
             }
 
             if (string.IsNullOrEmpty(nome))
             {
-                throw new DomainException("O nome do produto não pode ser vazio.");
+                throw new ArgumentException("Nome não pode ser vazio.");
             }
+
+            Nome = nome;
+            Preco = preco;
+            CategoriaId = categoriaId;
         }
     }
 }
 //Fim:Produto.cs
 
 //Inicio:Categoria.cs
-using ConectaFapes.Domain.Common;
 using System.Collections.Generic;
 
 namespace ConectaFapes.Domain.Entities
 {
     public class Categoria : BaseEntity
     {
-        public string Nome { get; private set; }
-        public virtual ICollection<Produto> Produtos { get; private set; } = new List<Produto>();
+        public string Nome { get; set; } = string.Empty;
+        public virtual ICollection<Produto> Produtos { get; set; } = new List<Produto>();
+
+        public Categoria() { }
 
         public Categoria(string nome)
         {
-            Validar(nome);
-            Nome = nome;
-        }
-
-        // Construtor para Entity Framework
-        protected Categoria() { }
-
-        public void Atualizar(string nome)
-        {
-            Validar(nome);
-            Nome = nome;
-        }
-
-        private void Validar(string nome)
-        {
+            // Regras de Negócio
             if (string.IsNullOrEmpty(nome))
             {
-                throw new DomainException("O nome da categoria não pode ser vazio.");
+                throw new ArgumentException("Nome não pode ser vazio.");
             }
+
+            Nome = nome;
         }
     }
 }
 //Fim:Categoria.cs
 
 //Inicio:Usuario.cs
-using ConectaFapes.Domain.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace ConectaFapes.Domain.Entities
 {
     public class Usuario : BaseEntity
     {
-        public string Nome { get; private set; }
-        public string Email { get; private set; }
-        public string Senha { get; private set; }
+        public string Nome { get; set; } = string.Empty;
+
+        [EmailAddress(ErrorMessage = "Email inválido.")]
+        public string Email { get; set; } = string.Empty;
+
+        [MinLength(8, ErrorMessage = "Senha deve ter no mínimo 8 caracteres.")]
+        public string Senha { get; set; } = string.Empty;
+
+        public Usuario() { }
 
         public Usuario(string nome, string email, string senha)
         {
-            Validar(email, senha);
-            Nome = nome;
-            Email = email;
-            Senha = senha;
-        }
-
-        // Construtor para Entity Framework
-        protected Usuario() { }
-
-        public void Atualizar(string nome, string email, string senha)
-        {
-            Validar(email, senha);
-            Nome = nome;
-            Email = email;
-            Senha = senha;
-        }
-
-        private void Validar(string email, string senha)
-        {
+            // Regras de Negócio
             if (!IsValidEmail(email))
             {
-                throw new DomainException("O email informado não é válido.");
+                throw new ArgumentException("Email inválido.");
             }
 
-            // Implemente a lógica de verificação de email único aqui
+            if (!IsUniqueEmail(email))
+            {
+                throw new ArgumentException("Email já cadastrado.");
+            }
 
             if (senha.Length < 8)
             {
-                throw new DomainException("A senha deve ter no mínimo 8 caracteres.");
+                throw new ArgumentException("Senha deve ter no mínimo 8 caracteres.");
             }
+
+            Nome = nome;
+            Email = email;
+            Senha = senha;
         }
 
+        // Funções Auxiliares para Regras de Negócio
         private bool IsValidEmail(string email)
         {
-            // Implemente a lógica de validação de email aqui
-            return true;
+            // Implementação de validação de email
+            return new EmailAddressAttribute().IsValid(email);
+        }
+
+        private bool IsUniqueEmail(string email)
+        {
+            // Implementação de verificação de unicidade
+            // (Simulação - Substitua por lógica real de banco de dados)
+            return !email.Equals("usuarioexistente@example.com", StringComparison.OrdinalIgnoreCase);
         }
     }
 }
 //Fim:Usuario.cs
 
-//Inicio:DomainException.cs
-using System;
+//Inicio:Resolucao.cs
+using ConectaFapes.Domain.Common;
+using ConectaFapes.Domain.Validation;
+using System.Reflection;
 
-namespace ConectaFapes.Domain.Common
+namespace ConectaFapes.Domain.Entities.CadastroModalidadesBolsas
 {
-    public class DomainException : Exception
+    public class Resolucao : BaseEntity
     {
-        public DomainException(string message) : base(message) { }
+        public int Numero { get; set; }
+        public DateTimeOffset Data { get; set; }
+        public string Ementa { get; set; } = String.Empty;
+        public string Link { get; set; } = String.Empty;
+        public ICollection<VersaoModalidade> VersaoModalidadesBolsas { get; } = [];
+
+        public Resolucao() { }
+
+        public Resolucao(int numero, DateTimeOffset data, string ementa, string link)
+        {
+            var validationErrors = ResolucaoValidation(numero, data, ementa, link);
+
+            if (validationErrors.Count > 0)
+            {
+                throw new DomainValidationException(validationErrors);
+            }
+
+            Numero = numero;
+            Data = data;
+            Ementa = ementa;
+            Link = link;
+        }
+
+        public bool PossuiModalidades()
+        {
+            return (VersaoModalidadesBolsas.Count() <= 0 || VersaoModalidadesBolsas == null) ? false : true;
+        }
+
+        private List<string> ResolucaoValidation(int numero, DateTimeOffset data, string ementa, string link)
+        {
+            var errors = new List<string>();
+
+            if (numero < 0) errors.Add("O número da resolução não pode ser negativo");
+            if (string.IsNullOrEmpty(ementa)) errors.Add("A ementa da resolução não pode ser vazia");
+            if (string.IsNullOrEmpty(link)) errors.Add("O link da resolução não pode ser vazia");
+
+            return errors;
+        }
+
+        public void AdicionarVersaoModalidade(VersaoModalidade VersaoModalidade)
+        {
+            VersaoModalidadesBolsas.Add(VersaoModalidade);
+        }
     }
 }
-//Fim:DomainException.cs
+
+
+//Fim:Resolucao.cs
 ```
-
-**Observações:**
-
-* O namespace foi alterado para `ConectaFapes.Domain.Common` e `ConectaFapes.Domain.Entities` para refletir o nome do projeto.
-* As classes agora estão todas interligadas corretamente pelas importações `using` no início de cada arquivo.
-* A classe `BaseEntity` está sendo usada como base para as entidades `Produto`, `Categoria` e `Usuario`, fornecendo a propriedade `Id` e o método `Update`.
-* As classes de entidade possuem construtores para inicializar suas propriedades, validações para garantir a integridade dos dados e métodos para atualização.
-* A classe `DomainException` é usada para lançar exceções específicas do domínio.
-
-Lembre-se de que este é um exemplo básico e você pode precisar adaptá-lo às suas necessidades específicas. Por exemplo, você pode querer adicionar mais validações, implementar a lógica de persistência de dados ou usar um framework de validação diferente.

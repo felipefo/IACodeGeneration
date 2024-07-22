@@ -57,11 +57,11 @@ O resultado é a criação de pastas de arquivos c# dentro do projeto DotNet: Mi
 ## Rodando o pipiline 
 
 Rodando o pipeline com o Luigi 
--1. Gera classes das entidades 
--2. Formata as clases geradas
--3. Gera o arquivo de contextodb
--4. TODO: Copiar o arquivo para o local correto
--5. TODO: Gerar o migration e aplicar
+- 1. Gera classes das entidades 
+- 2. Formata as clases geradas
+- 3. Gera o arquivo de contextodb
+- 4. TODO: Copiar o arquivo para o local correto
+- 5. TODO: Gerar o migration e aplicar
 
 ```
 python pipeline.py 
