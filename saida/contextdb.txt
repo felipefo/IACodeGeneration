@@ -1,0 +1,27 @@
+================================== Ai Message ==================================
+
+```csharp
+using ConectaFapes.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace ConectaFapes.Data
+{
+    public class ConectaFapesContext : DbContext
+    {
+        public ConectaFapesContext(DbContextOptions<ConectaFapesContext> options)
+            : base(options) { }
+
+        public DbSet<Produto> Produtos { get; set; }
+        public DbSet<Categoria> Categorias { get; set; }
+        public DbSet<Usuario> Usuarios { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Produto>()
+                .HasOne(p => p.Categoria)
+                .WithMany(c => c.Produtos)
+                .HasForeignKey(p => p.CategoriaId);
+        }
+    }
+}
+```

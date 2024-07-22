@@ -22,7 +22,7 @@ gemini_model = ChatGoogleGenerativeAI(
     temperature=0,
     top_p=0.1,
     top_k =2,
-    google_api_key=""
+    google_api_key="AIzaSyBnwJK8-jyP1a_ePdrJPot0CjCHH4-uaX8"
 )
 
 # Definição do template de prompt
@@ -35,6 +35,8 @@ prompt_template_code = PromptTemplate(
     input_variables=["dsl", "codigo_csharp"],
     template="Coloque o nome do projeto ConectaFapes no namespace no lugar da palavra MeuProjeto. Resolva as importacoes entre as classe quando e das com a Classe Entity.cs \n\n{codigo_csharp}"
 )
+
+
 
 # Função para chamar o modelo Gemini
 def run_gemini_chain(prompt_template, inputs):
@@ -54,10 +56,10 @@ def process_file_with_chain(file_path, file_resolucao, file_entity):
     dsl_content = read_file(file_path)
     codigo_csharp = read_file(file_resolucao)
     codigo_entity  = read_file(file_entity)
+    
     # Processar o conteúdo com a cadeia
     result = run_gemini_chain(prompt_template_dsl_to_csharp, {"dsl": dsl_content , "codigo_csharp": codigo_csharp, "codigo_entity": codigo_entity})
     codigo = run_gemini_chain(prompt_template_code, {"codigo_csharp": result} )
-
     
     return codigo
 

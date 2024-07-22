@@ -2,11 +2,13 @@ import os
 import re
 
 def criar_diretorio(caminho):
+    caminho = caminho.replace("\\", "/")
     if not os.path.exists(caminho):
         os.makedirs(caminho)
 
 def salvar_arquivo(caminho, conteudo):
-    with open(caminho, 'w', encoding='utf-8') as arquivo:
+    caminho = caminho.replace("\\", "/")
+    with open(caminho, 'w', encoding='cp1252') as arquivo:
         arquivo.write(conteudo)
 
 def processar_arquivo(arquivo_entrada):
@@ -52,5 +54,5 @@ def processar_arquivo(arquivo_entrada):
 
 # Exemplo de uso
 arquivo_entrada = './saida/resultado.txt'
-diretorio_projeto = "MiniApiDotNet"
+diretorio_projeto = "./MiniApiDotNet"
 processar_arquivo(arquivo_entrada)
